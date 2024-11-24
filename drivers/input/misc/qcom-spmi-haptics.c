@@ -10,6 +10,7 @@
 #include <linux/bits.h>
 #include <linux/bitfield.h>
 #include <linux/errno.h>
+#include <linux/gpio/consumer.h>
 #include <linux/input.h>
 #include <linux/interrupt.h>
 #include <linux/kernel.h>
@@ -171,6 +172,7 @@ struct spmi_haptics {
 	struct device *dev;
 	struct regmap *regmap;
 	struct input_dev *haptics_input_dev;
+	struct gpio_desc *boost;
 	struct work_struct work;
 	u32 base;
 
@@ -821,11 +823,6 @@ static int spmi_haptics_probe(struct platform_device *pdev)
 	haptics->actuator_type = HAP_TYPE_LRA;
 	ret = of_property_read_u32(node, "qcom,actuator-type", &val);
 	if (!ret) {
-		if (val != HAP_TYPE_LRA) {
-			dev_err(&pdev->dev, "qcom,actuator-type (%d) isn't supported\n", val);
-			ret = -EINVAL;
-			goto register_fail;
-		}
 		haptics->actuator_type = val;
 	}
 
@@ -874,6 +871,16 @@ static int spmi_haptics_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "qcom,brake-pattern is invalid, ret = %d\n", ret);
 		goto register_fail;
 	}
+
+	haptics->boost =
+		devm_gpiod_get_optional(haptics->dev, "qcom,boost", GPIOD_OUT_HIGH);
+	if (IS_ERR(haptics->boost)) {
+		ret = PTR_ERR(haptics->boost);
+		dev_warn(haptics->dev, "Unable to get boost gpio: %d\n", ret);
+	}
+
+	if (haptics->boost)
+		gpiod_set_value_cansleep(haptics->boost, 1);
 
 	haptics->current_limit = HAP_ILIM_400_MA;
 
@@ -945,6 +952,9 @@ static void spmi_haptics_remove(struct platform_device *pdev)
 	cancel_work_sync(&haptics->work);
 	mutex_destroy(&haptics->play_lock);
 	input_unregister_device(haptics->haptics_input_dev);
+
+	if (haptics->boost)
+		gpiod_set_value_cansleep(haptics->boost, 0);
 }
 
 static void spmi_haptics_shutdown(struct platform_device *pdev)
@@ -954,6 +964,9 @@ static void spmi_haptics_shutdown(struct platform_device *pdev)
 	cancel_work_sync(&haptics->work);
 
 	spmi_haptics_disable(haptics);
+
+	if (haptics->boost)
+		gpiod_set_value_cansleep(haptics->boost, 0);
 }
 
 static const struct of_device_id spmi_haptics_match_table[] = {
