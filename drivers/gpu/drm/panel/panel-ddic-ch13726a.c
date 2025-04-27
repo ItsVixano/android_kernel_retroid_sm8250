@@ -2,6 +2,7 @@
 /*
  * DDIC CH13726A MIPI-DSI panel driver
  * Copyright (c) 2024, Teguh Sobirin <teguh@sobir.in>.
+ * Copyright (c) 2025, ROCKNIX <https://rocknix.org>.
  */
 
 #include <linux/backlight.h>
@@ -167,6 +168,22 @@ static const struct drm_display_mode rp5_display_mode = {
 	.height_mm = 121,
 };
 
+static const struct drm_display_mode rpminiv2_display_mode = {
+	.clock = (1080 + 28 + 4 + 36) * (1240 + 16 + 4 + 8) * 60 / 1000,
+	.hdisplay = 1080,
+	.hsync_start = 1080 + 28,
+	.hsync_end = 1080 + 28 + 4,
+	.htotal = 1080 + 28 + 4 + 36,
+	.vdisplay = 1240,
+	.vsync_start = 1240 + 16,
+	.vsync_end = 1240 + 16 + 4,
+	.vtotal = 1240 + 16 + 4 + 8,
+	.width_mm = 65,
+	.height_mm = 75,
+	.flags = DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC,
+	.type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED,
+};
+
 static int ch13726a_get_modes(struct drm_panel *panel,
 					struct drm_connector *connector)
 {
@@ -323,6 +340,7 @@ static void ch13726a_remove(struct mipi_dsi_device *dsi)
 static const struct of_device_id ch13726a_of_match[] = {
 	{ .compatible = "ch13726a,rpmini", .data = &rpmini_display_mode },
 	{ .compatible = "ch13726a,rp5", .data = &rp5_display_mode },
+	{ .compatible = "ch13726a,rpminiv2", .data = &rpminiv2_display_mode },
 	{ /* sentinel */ }
 };
 MODULE_DEVICE_TABLE(of, ch13726a_of_match);
