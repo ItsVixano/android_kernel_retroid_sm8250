@@ -857,6 +857,14 @@
 			reg = <0x0 0x8bf00000 0x0 0x4600000>;
 			no-map;
 		};
+
+		fastrpc_mem: fastrpc {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0x0 0x00000000 0x0 0xffffffff>;
+			alignment = <0x0 0x400000>;
+			size = <0x0 0x2000000>;
+			reusable;
+		};
 	};
 
 	smem {
@@ -3110,6 +3118,7 @@
 					qcom,glink-channels = "fastrpcglink-apps-dsp";
 					label = "sdsp";
 					qcom,non-secure-domain;
+					memory-region = <&fastrpc_mem>;
 					#address-cells = <1>;
 					#size-cells = <0>;
 
@@ -3812,6 +3821,7 @@
 					qcom,glink-channels = "fastrpcglink-apps-dsp";
 					label = "cdsp";
 					qcom,non-secure-domain;
+					memory-region = <&fastrpc_mem>;
 					#address-cells = <1>;
 					#size-cells = <0>;
 
@@ -6063,6 +6073,7 @@
 					qcom,glink-channels = "fastrpcglink-apps-dsp";
 					label = "adsp";
 					qcom,non-secure-domain;
+					memory-region = <&fastrpc_mem>;
 					#address-cells = <1>;
 					#size-cells = <0>;
 
