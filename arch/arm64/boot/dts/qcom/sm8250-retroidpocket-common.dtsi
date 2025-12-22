@@ -301,7 +301,7 @@
 
 &adsp {
 	status = "okay";
-	firmware-name = "qcom/sm8250/adsp.mbn";
+	firmware-name = "qcom/sm8250/retroid/adsp.mbn";
 };
 
 &apps_rsc {
@@ -553,7 +553,7 @@
 
 &cdsp {
 	status = "okay";
-	firmware-name = "qcom/sm8250/cdsp.mbn";
+	firmware-name = "qcom/sm8250/retroid/cdsp.mbn";
 };
 
 &gmu {
@@ -565,7 +565,7 @@
 
 	zap-shader {
 		memory-region = <&gpu_mem>;
-		firmware-name = "qcom/sm8250/a650_zap.mbn";
+		firmware-name = "qcom/sm8250/retroid/a650_zap.mbn";
 	};
 };
 
