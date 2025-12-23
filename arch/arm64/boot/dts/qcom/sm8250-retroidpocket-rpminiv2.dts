@@ -16,6 +16,8 @@
 		#size-cells = <2>;
 		ranges;
 
+		bootargs = "androidboot.hardware.sku=rpminiv2";
+
 		framebuffer: framebuffer@9c000000 {
 			compatible = "simple-framebuffer";
 			reg = <0x0 0x9c000000 0x0 0x2300000>;
